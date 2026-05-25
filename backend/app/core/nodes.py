@@ -4,8 +4,8 @@ import re
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 
-from app.core.state import InterviewState
 from app.core.profile import ProfileManager
+from app.core.assessment import validate_assessment
 from app.agents.tech import TechAgent
 from app.agents.pressure import PressureAgent
 from app.agents.comprehensive import ComprehensiveAgent
@@ -39,85 +39,121 @@ _STAGE_ASSESSMENT_PROMPTS = {
 }
 
 
-def _load_profile(state: InterviewState) -> ProfileManager | None:
+def _load_profile(state: dict) -> ProfileManager | None:
     return ProfileManager.load(state["session_id"])
 
 
-async def tech_node(state: InterviewState) -> dict:
+async def tech_node(state: dict) -> dict:
     profile = _load_profile(state)
     if not profile:
         return {"error": "会话不存在", "finished": True}
+
+    existing_asked = state.get("asked_question_ids", []) or profile.get_asked_ids()
+    profile_data = profile.get_full_profile()
+    profile_data["asked_ids"] = existing_asked
 
     agent = TechAgent(state["job_type"])
     response = await agent.interview(
-        profile.get_full_profile(),
+        profile_data,
         state.get("user_answer"),
         state["current_round"]
     )
 
+    new_ids = response.used_question_ids
+    updated_asked = list(set(existing_asked + new_ids))
+
     profile.add_dialog("interviewer", response.message, "TECH")
+    if new_ids:
+        profile.add_asked_ids(new_ids)
     profile.increment_round()
+
+    assessment = validate_assessment("TECH", response.assessment) if response.assessment else None
 
     return {
         "agent_message": response.message,
         "agent_thinking": response.thinking,
         "should_handover": response.should_handover,
-        "assessment": response.assessment,
+        "assessment": assessment,
         "current_round": profile.current_round,
         "stage": "TECH",
-        "error": None
+        "error": None,
+        "asked_question_ids": updated_asked
     }
 
 
-async def pressure_node(state: InterviewState) -> dict:
+async def pressure_node(state: dict) -> dict:
     profile = _load_profile(state)
     if not profile:
         return {"error": "会话不存在", "finished": True}
+
+    existing_asked = state.get("asked_question_ids", []) or profile.get_asked_ids()
+    profile_data = profile.get_full_profile()
+    profile_data["asked_ids"] = existing_asked
 
     agent = PressureAgent(state["job_type"])
     response = await agent.interview(
-        profile.get_full_profile(),
+        profile_data,
         state.get("user_answer"),
         state["current_round"]
     )
 
+    new_ids = response.used_question_ids
+    updated_asked = list(set(existing_asked + new_ids))
+
     profile.add_dialog("interviewer", response.message, "PRESSURE")
+    if new_ids:
+        profile.add_asked_ids(new_ids)
     profile.increment_round()
+
+    assessment = validate_assessment("PRESSURE", response.assessment) if response.assessment else None
 
     return {
         "agent_message": response.message,
         "agent_thinking": response.thinking,
         "should_handover": response.should_handover,
-        "assessment": response.assessment,
+        "assessment": assessment,
         "current_round": profile.current_round,
         "stage": "PRESSURE",
-        "error": None
+        "error": None,
+        "asked_question_ids": updated_asked
     }
 
 
-async def comprehensive_node(state: InterviewState) -> dict:
+async def comprehensive_node(state: dict) -> dict:
     profile = _load_profile(state)
     if not profile:
         return {"error": "会话不存在", "finished": True}
 
+    existing_asked = state.get("asked_question_ids", []) or profile.get_asked_ids()
+    profile_data = profile.get_full_profile()
+    profile_data["asked_ids"] = existing_asked
+
     agent = ComprehensiveAgent(state["job_type"])
     response = await agent.interview(
-        profile.get_full_profile(),
+        profile_data,
         state.get("user_answer"),
         state["current_round"]
     )
 
+    new_ids = response.used_question_ids
+    updated_asked = list(set(existing_asked + new_ids))
+
     profile.add_dialog("interviewer", response.message, "COMPREHENSIVE")
+    if new_ids:
+        profile.add_asked_ids(new_ids)
     profile.increment_round()
+
+    assessment = validate_assessment("COMPREHENSIVE", response.assessment) if response.assessment else None
 
     return {
         "agent_message": response.message,
         "agent_thinking": response.thinking,
         "should_handover": response.should_handover,
-        "assessment": response.assessment,
+        "assessment": assessment,
         "current_round": profile.current_round,
         "stage": "COMPREHENSIVE",
-        "error": None
+        "error": None,
+        "asked_question_ids": updated_asked
     }
 
 

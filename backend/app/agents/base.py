@@ -9,6 +9,7 @@ class AgentResponse(BaseModel):
     thinking: list[str] = []
     should_handover: bool = False
     assessment: dict | None = None
+    used_question_ids: list[str] = []
 
 
 class BaseAgent(ABC):

@@ -93,4 +93,25 @@ def get_session(session_id: str) -> dict | None:
     return None
 
 
+def get_active_session_by_resume(resume_id: str) -> dict | None:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM sessions WHERE resume_id = ? AND stage != 'DONE' ORDER BY created_at DESC LIMIT 1",
+        (resume_id,)
+    )
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return {
+            "session_id": row["session_id"],
+            "resume_id": row["resume_id"],
+            "job_type": row["job_type"],
+            "stage": row["stage"],
+            "current_round": row["current_round"],
+            "profile_data": json.loads(row["profile_data"])
+        }
+    return None
+
+
 init_db()

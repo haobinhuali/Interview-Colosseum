@@ -1,15 +1,50 @@
 import uuid
+import time
+from collections import OrderedDict
 
-from app.core.state import InterviewState
+from pydantic import BaseModel
+
 from app.core.profile import ProfileManager
-from app.core.graph import interview_graph, STAGES, MAX_ROUNDS_PER_STAGE
 from app.agents.base import AgentResponse
 from app.utils.resume import get_parsed_resume
-from app.core.nodes import force_assessment, save_assessment
+from app.utils.db import get_active_session_by_resume
+from app.core.nodes import (
+    tech_node,
+    pressure_node,
+    comprehensive_node,
+    force_assessment,
+    save_assessment,
+)
+
+STAGES = ["INIT", "TECH", "PRESSURE", "COMPREHENSIVE", "DONE"]
+MAX_ROUNDS_PER_STAGE = 8
+
+_NODE_MAP = {
+    "TECH": tech_node,
+    "PRESSURE": pressure_node,
+    "COMPREHENSIVE": comprehensive_node,
+}
+
+
+class InterviewState(BaseModel):
+    session_id: str
+    stage: str
+    current_round: int
+    user_answer: str | None = None
+    agent_message: str = ""
+    agent_thinking: list[str] = []
+    should_handover: bool = False
+    assessment: dict | None = None
+    job_type: str
+    finished: bool = False
+    error: str | None = None
+    asked_question_ids: list[str] = []
 
 
 class Orchestrator:
-    _sessions: dict[str, "Orchestrator"] = {}
+    _sessions: OrderedDict[str, tuple["Orchestrator", float]] = OrderedDict()
+    _MAX_CACHE_SIZE = 100
+    _TTL_SECONDS = 3600
 
     def __init__(self, session_id: str, profile_manager: ProfileManager, job_type: str):
         self.session_id = session_id
@@ -18,6 +53,12 @@ class Orchestrator:
 
     @classmethod
     def create_session(cls, resume_id: str, job_type: str) -> "Orchestrator":
+        active = get_active_session_by_resume(resume_id)
+        if active:
+            existing = cls.get_session(active["session_id"])
+            if existing:
+                return existing
+
         session_id = str(uuid.uuid4())
         resume_data = get_parsed_resume(resume_id)
         if not resume_data:
@@ -29,19 +70,47 @@ class Orchestrator:
         pm.reset_round()
 
         orchestrator = cls(session_id, pm, job_type)
-        cls._sessions[session_id] = orchestrator
+        cls._put_cache(session_id, orchestrator)
         return orchestrator
 
     @classmethod
     def get_session(cls, session_id: str) -> "Orchestrator | None":
         if session_id in cls._sessions:
-            return cls._sessions[session_id]
+            orchestrator, timestamp = cls._sessions[session_id]
+            if time.time() - timestamp < cls._TTL_SECONDS:
+                cls._sessions.move_to_end(session_id)
+                return orchestrator
+            else:
+                del cls._sessions[session_id]
+
         pm = ProfileManager.load(session_id)
         if pm is None:
             return None
         orchestrator = cls(session_id, pm, pm.job_type)
-        cls._sessions[session_id] = orchestrator
+        cls._put_cache(session_id, orchestrator)
         return orchestrator
+
+    @classmethod
+    def _put_cache(cls, session_id: str, orchestrator: "Orchestrator"):
+        cls._sessions[session_id] = (orchestrator, time.time())
+        cls._sessions.move_to_end(session_id)
+        cls._evict_cache()
+
+    @classmethod
+    def _evict_cache(cls):
+        now = time.time()
+        while cls._sessions:
+            sid, (_, ts) = next(iter(cls._sessions.items()))
+            if now - ts >= cls._TTL_SECONDS or len(cls._sessions) > cls._MAX_CACHE_SIZE:
+                cls._sessions.popitem(last=False)
+            else:
+                break
+
+    async def _run_node(self, state: InterviewState) -> dict:
+        node_func = _NODE_MAP.get(state.stage)
+        if not node_func:
+            return {"error": f"未知阶段: {state.stage}", "finished": True}
+        return await node_func(state.model_dump())
 
     async def get_first_question(self) -> AgentResponse:
         self.profile.add_dialog("candidate", "", "TECH")
@@ -51,16 +120,12 @@ class Orchestrator:
             stage="TECH",
             current_round=0,
             user_answer=None,
-            agent_message="",
-            agent_thinking=[],
-            should_handover=False,
-            assessment=None,
             job_type=self.job_type,
-            finished=False,
-            error=None
+            asked_question_ids=self.profile.get_asked_ids()
         )
 
-        result = await interview_graph.ainvoke(initial_state)
+        result = await self._run_node(initial_state)
+        self._sync_asked_ids(result)
 
         return AgentResponse(
             message=result.get("agent_message", "请开始面试"),
@@ -86,16 +151,12 @@ class Orchestrator:
             stage=current_stage,
             current_round=self.profile.current_round,
             user_answer=user_answer,
-            agent_message="",
-            agent_thinking=[],
-            should_handover=False,
-            assessment=None,
             job_type=self.job_type,
-            finished=False,
-            error=None
+            asked_question_ids=self.profile.get_asked_ids()
         )
 
-        result = await interview_graph.ainvoke(current_state)
+        result = await self._run_node(current_state)
+        self._sync_asked_ids(result)
 
         if result.get("error"):
             return {
@@ -153,16 +214,12 @@ class Orchestrator:
             stage=next_stage,
             current_round=0,
             user_answer=None,
-            agent_message="",
-            agent_thinking=[],
-            should_handover=False,
-            assessment=None,
             job_type=self.job_type,
-            finished=False,
-            error=None
+            asked_question_ids=self.profile.get_asked_ids()
         )
 
-        next_result = await interview_graph.ainvoke(next_state)
+        next_result = await self._run_node(next_state)
+        self._sync_asked_ids(next_result)
 
         return {
             "message": next_result.get("agent_message", "请继续"),
@@ -210,16 +267,12 @@ class Orchestrator:
             stage=next_stage,
             current_round=0,
             user_answer=None,
-            agent_message="",
-            agent_thinking=[],
-            should_handover=False,
-            assessment=None,
             job_type=self.job_type,
-            finished=False,
-            error=None
+            asked_question_ids=self.profile.get_asked_ids()
         )
 
-        next_result = await interview_graph.ainvoke(next_state)
+        next_result = await self._run_node(next_state)
+        self._sync_asked_ids(next_result)
 
         return {
             "message": next_result.get("agent_message", "请继续"),
@@ -262,12 +315,19 @@ class Orchestrator:
         }
 
     def _get_next_stage(self, current_stage: str) -> str:
-        stages = ["INIT", "TECH", "PRESSURE", "COMPREHENSIVE", "DONE"]
         try:
-            idx = stages.index(current_stage)
-            return stages[idx + 1] if idx + 1 < len(stages) else "DONE"
+            idx = STAGES.index(current_stage)
+            return STAGES[idx + 1] if idx + 1 < len(STAGES) else "DONE"
         except ValueError:
             return "DONE"
+
+    def _sync_asked_ids(self, result: dict):
+        asked_from_state = result.get("asked_question_ids", [])
+        if asked_from_state:
+            current = set(self.profile.profile.get("asked_ids", []))
+            current.update(asked_from_state)
+            self.profile.profile["asked_ids"] = list(current)
+            self.profile._persist()
 
     def force_finish(self):
         current_stage = self.profile.stage

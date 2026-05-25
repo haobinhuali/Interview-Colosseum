@@ -61,6 +61,26 @@ class RAGLogger:
         with open(log_file, "a", encoding="utf-8") as f:
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
+    def log_performance(
+        self,
+        stage: str,
+        elapsed_ms: float,
+        asked_count: int,
+        result_count: int,
+    ):
+        entry = {
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "event": "performance",
+            "stage": stage,
+            "elapsed_ms": round(elapsed_ms, 2),
+            "asked_count": asked_count,
+            "result_count": result_count,
+        }
+
+        log_file = self.log_dir / f"rag_{time.strftime('%Y%m%d')}.jsonl"
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
 
 _rag_logger: RAGLogger | None = None
 

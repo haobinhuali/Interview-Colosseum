@@ -29,7 +29,8 @@ class ProfileManager:
             "tech_summary": "",
             "pressure_summary": "",
             "key_tech_dialogs": [],
-            "key_pressure_dialogs": []
+            "key_pressure_dialogs": [],
+            "asked_ids": []
         }
 
     @classmethod
@@ -46,18 +47,23 @@ class ProfileManager:
 
     def _ensure_fields(self):
         defaults = {
-            "tech_summary": "",
-            "pressure_summary": "",
-            "key_tech_dialogs": [],
-            "key_pressure_dialogs": [],
+            "resume": {},
             "tech_assessment": {"tech_depth": 0, "integrity_flag": "", "communication": 0},
             "pressure_assessment": {"pressure_resistance": 0, "stress_style": ""},
             "comprehensive_assessment": {"recovery": 0, "knowledge_transfer": 0},
+            "dialog_history": [],
+            "tech_summary": "",
+            "pressure_summary": "",
+            "comprehensive_summary": "",
+            "key_tech_dialogs": [],
+            "key_pressure_dialogs": [],
+            "key_comprehensive_dialogs": [],
+            "asked_ids": [],
         }
         for key, default in defaults.items():
             if key not in self.profile:
                 self.profile[key] = copy.deepcopy(default)
-            elif isinstance(default, dict):
+            elif isinstance(default, dict) and isinstance(self.profile[key], dict):
                 for k, v in default.items():
                     if k not in self.profile[key]:
                         self.profile[key][k] = v
@@ -134,6 +140,15 @@ class ProfileManager:
             key_indices.append(len(dialog_history) - 1)
         key_indices = list(dict.fromkeys(key_indices))
         return [dialog_history[i] for i in key_indices if i < len(dialog_history)]
+
+    def get_asked_ids(self) -> list[str]:
+        return self.profile.get("asked_ids", [])
+
+    def add_asked_ids(self, ids: list[str]):
+        current = set(self.profile.get("asked_ids", []))
+        current.update(ids)
+        self.profile["asked_ids"] = list(current)
+        self._persist()
 
     def _persist(self):
         save_session(

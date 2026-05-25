@@ -1,5 +1,7 @@
 import os
+import time
 from pathlib import Path
+from typing import TypedDict
 
 import chromadb
 
@@ -8,6 +10,11 @@ from app.rag.rag_logger import get_rag_logger
 
 _CHROMA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "chroma_db")
 _COLLECTION_NAME = "interview_questions"
+
+
+class RAGQueryResult(TypedDict):
+    ids: list[str]
+    texts: list[str]
 
 
 class RAGQuestionBank:
@@ -53,37 +60,23 @@ class RAGQuestionBank:
         current_stage: str,
         k: int = 2,
         query_text: str | None = None,
-    ) -> list[str]:
+        asked_ids: list[str] | None = None,
+    ) -> RAGQueryResult:
+        start_time = time.perf_counter()
         search_text = query_text if query_text else f"{current_stage} {job_type}"
+        asked_set = set(asked_ids) if asked_ids else set()
+        collection_count = self.collection.count()
+        fetch_n = min(max(k + len(asked_set), k * 3, 5), collection_count)
 
         where_filter = {"stage": current_stage}
         if job_type:
             where_filter = {"$and": [{"stage": current_stage}, {"job_type": job_type}]}
 
-        try:
-            results = self.collection.query(
-                query_texts=[search_text],
-                n_results=k,
-                where=where_filter,
-                include=["metadatas", "distances"],
-            )
-        except Exception:
-            results = self.collection.query(
-                query_texts=[search_text],
-                n_results=k,
-                where={"stage": current_stage},
-                include=["metadatas", "distances"],
-            )
-
-        if not results["metadatas"] or not results["metadatas"][0]:
-            results = self.collection.query(
-                query_texts=[search_text],
-                n_results=k,
-                include=["metadatas", "distances"],
-            )
+        results = self._do_query(search_text, fetch_n, where_filter)
 
         metadatas = results["metadatas"][0] if results["metadatas"] else []
         distances = results["distances"][0] if results["distances"] else []
+        result_ids = results["ids"][0] if results["ids"] else []
 
         self.logger.log_query(
             stage=current_stage,
@@ -94,16 +87,79 @@ class RAGQuestionBank:
             k=k,
         )
 
-        formatted = []
-        for m in metadatas:
-            formatted.append(
+        filtered_ids: list[str] = []
+        filtered_texts: list[str] = []
+        for i, m in enumerate(metadatas):
+            qid = result_ids[i] if i < len(result_ids) else ""
+            if qid in asked_set:
+                continue
+            filtered_ids.append(qid)
+            filtered_texts.append(
                 f"类别：{m['category']}\n"
                 f"阶段：{m['stage']}\n"
                 f"岗位：{m['job_type']}\n"
                 f"问题：{m['question']}\n"
                 f"参考答案：{m['reference_answer']}"
             )
-        return formatted
+            if len(filtered_ids) >= k:
+                break
+
+        if not filtered_ids and metadatas:
+            for i, qid in enumerate(result_ids):
+                if qid not in asked_set:
+                    m = metadatas[i]
+                    filtered_ids = [qid]
+                    filtered_texts = [
+                        f"类别：{m['category']}\n"
+                        f"阶段：{m['stage']}\n"
+                        f"岗位：{m['job_type']}\n"
+                        f"问题：{m['question']}\n"
+                        f"参考答案：{m['reference_answer']}"
+                    ]
+                    break
+
+        if not filtered_ids:
+            filtered_ids = []
+            filtered_texts = ["标准题库已耗尽，请基于简历自由追问"]
+
+        elapsed_ms = (time.perf_counter() - start_time) * 1000
+        self.logger.log_performance(
+            stage=current_stage,
+            elapsed_ms=elapsed_ms,
+            asked_count=len(asked_set),
+            result_count=len(filtered_ids)
+        )
+
+        return RAGQueryResult(ids=filtered_ids, texts=filtered_texts)
+
+    def _do_query(self, search_text: str, n_results: int, where_filter: dict) -> dict:
+        try:
+            return self.collection.query(
+                query_texts=[search_text],
+                n_results=n_results,
+                where=where_filter,
+                include=["metadatas", "distances"],
+            )
+        except Exception:
+            pass
+
+        stage_value = where_filter.get("stage")
+        if stage_value:
+            try:
+                return self.collection.query(
+                    query_texts=[search_text],
+                    n_results=n_results,
+                    where={"stage": stage_value},
+                    include=["metadatas", "distances"],
+                )
+            except Exception:
+                pass
+
+        return self.collection.query(
+            query_texts=[search_text],
+            n_results=n_results,
+            include=["metadatas", "distances"],
+        )
 
     def add_questions(self, questions: list[dict]) -> int:
         if not questions:
@@ -162,9 +218,10 @@ def query_questions(
     current_stage: str,
     k: int = 2,
     query_text: str | None = None,
-) -> list[str]:
+    asked_ids: list[str] | None = None,
+) -> RAGQueryResult:
     qb = get_question_bank()
-    return qb.query_questions(job_type, current_stage, k, query_text)
+    return qb.query_questions(job_type, current_stage, k, query_text, asked_ids)
 
 
 def add_custom_questions(questions: list[dict]) -> int:

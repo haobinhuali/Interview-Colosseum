@@ -5,6 +5,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from app.agents.base import BaseAgent, AgentResponse
 from app.rag.question_bank import query_questions
 from app.config import OPENAI_API_KEY, OPENAI_BASE_URL, DEFAULT_MODEL, PRESSURE_AGENT_TEMPERATURE
+from app.utils.retry import retry
 
 
 PRESSURE_SYSTEM_PROMPT = """你是一位挑战型技术 VP，代号"压力挑战者"。
@@ -57,9 +58,11 @@ class PressureAgent(BaseAgent):
             base_url=OPENAI_BASE_URL
         )
 
+    @retry(max_attempts=3, delay=1.0, backoff=2.0)
     async def interview(self, profile: dict, user_answer: str | None, current_round: int) -> AgentResponse:
-        reference_questions = query_questions(self.job_type, "PRESSURE", k=2, query_text=user_answer)
-        ref_text = "\n".join(reference_questions)
+        asked_ids = profile.get("asked_ids", [])
+        rag_result = query_questions(self.job_type, "PRESSURE", k=2, query_text=user_answer, asked_ids=asked_ids)
+        ref_text = "\n".join(rag_result["texts"])
 
         tech_assessment = profile.get("tech_assessment", {})
         tech_summary = profile.get("tech_summary", "")
@@ -115,4 +118,6 @@ class PressureAgent(BaseAgent):
         ]
 
         response = await self.llm.ainvoke(messages)
-        return self._parse_response(response.content)
+        parsed = self._parse_response(response.content)
+        parsed.used_question_ids = rag_result["ids"]
+        return parsed
