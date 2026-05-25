@@ -1,0 +1,136 @@
+Windows PowerShell
+版权所有（C） Microsoft Corporation。保留所有权利。
+
+安装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows
+
+加载个人及系统配置文件用了 3645 毫秒。
+(base) PS E:\development\Interview-Colosseum> pip install -r requirements.txt
+ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'
+(base) PS E:\development\Interview-Colosseum> cd backend
+(base) PS E:\development\Interview-Colosseum\backend> pip install -r requirements.txt
+Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple
+Requirement already satisfied: fastapi>=0.104.0 in d:\development\anaconda\lib\site-packages (from -r requirements.txt (line 1)) (0.136.1)
+Requirement already satisfied: uvicorn>=0.24.0 in d:\development\anaconda\lib\site-packages (from -r requirements.txt (line 2)) (0.46.0)
+Requirement already satisfied: python-multipart>=0.0.6 in d:\development\anaconda\lib\site-packages (from -r requirements.txt (line 3)) (0.0.28)
+Requirement already satisfied: python-dotenv>=1.0.0 in d:\development\anaconda\lib\site-packages (from -r requirements.txt (line 4)) (1.1.0)
+Collecting langchain>=0.1.0 (from -r requirements.txt (line 5))
+  ERROR: HTTP error 403 while getting https://pypi.tuna.tsinghua.edu.cn/packages/7b/6f/b9a9721c27fbb6d29a6a7cd89d6a41eeffc7c79b4
+9b9a5cf5beb1d60952d/langchain-1.3.0-py3-none-any.whl (from https://pypi.tuna.tsinghua.edu.cn/simple/langchain/) (requires-python:<4.0.0,>=3.10.0)
+ERROR: Could not install requirement langchain>=0.1.0 from https://pypi.tuna.tsinghua.edu.cn/packages/7b/6f/b9a9721c27fbb6d29a6a
+7cd89d6a41eeffc7c79b49b9a5cf5beb1d60952d/langchain-1.3.0-py3-none-any.whl (from -r requirements.txt (line 5)) because of HTTP er
+ror 403 Client Error: Forbidden for url: https://pypi.tuna.tsinghua.edu.cn/packages/7b/6f/b9a9721c27fbb6d29a6a7cd89d6a41eeffc7c7
+9b49b9a5cf5beb1d60952d/langchain-1.3.0-py3-none-any.whl for URL https://pypi.tuna.tsinghua.edu.cn/packages/7b/6f/b9a9721c27fbb6d
+29a6a7cd89d6a41eeffc7c79b49b9a5cf5beb1d60952d/langchain-1.3.0-py3-none-any.whl (from https://pypi.tuna.tsinghua.edu.cn/simple/langchain/) (requires-python:<4.0.0,>=3.10.0)
+(base) PS E:\development\Interview-Colosseum\backend> pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
+
+Looking in indexes: https://mirrors.aliyun.com/pypi/simple/
+Requirement already satisfied: fastapi>=0.104.0 in d:\development\anaconda\lib\site-packages (from -r requirements.txt (line 1)) (0.136.1)
+Requirement already satisfied: uvicorn>=0.24.0 in d:\development\anaconda\lib\site-packages (from -r requirements.txt (line 2)) (0.46.0)
+Requirement already satisfied: python-multipart>=0.0.6 in d:\development\anaconda\lib\site-packages (from -r requirements.txt (line 3)) (0.0.28)
+Requirement already satisfied: python-dotenv>=1.0.0 in d:\development\anaconda\lib\site-packages (from -r requirements.txt (line 4)) (1.1.0)
+Collecting langchain>=0.1.0 (from -r requirements.txt (line 5))
+  Downloading https://mirrors.aliyun.com/pypi/packages/7b/6f/b9a9721c27fbb6d29a6a7cd89d6a41eeffc7c79b49b9a5cf5beb1d60952d/langchain-1.3.0-py3-none-any.whl (114 kB)
+Collecting langchain-openai>=0.0.5 (from -r requirements.txt (line 6))
+  Downloading https://mirrors.aliyun.com/pypi/packages/dc/55/2865b18ee3a3dd11160b8c4b2cf37e75bf2a4a8d1d38868ffffc7b7cc180/langchain_openai-1.2.1-py3-none-any.whl (98 kB)
+Collecting langchain-community>=0.0.20 (from -r requirements.txt (line 7))
+  Downloading https://mirrors.aliyun.com/pypi/packages/f0/a4/c4fde67f193401512337456cabc2148f2c43316e445f5decd9f8806e2992/langchain_community-0.4.1-py3-none-any.whl (2.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.5/2.5 MB 1.1 MB/s eta 0:00:00
+Collecting langchain-text-splitters>=0.0.1 (from -r requirements.txt (line 8))
+  Using cached https://mirrors.aliyun.com/pypi/packages/d3/26/1ef06f56198d631296d646a6223de35bcc6cf9795ceb2442816bc963b84c/langchain_text_splitters-1.1.2-py3-none-any.whl (35 kB)
+Collecting pypdf2>=3.0.0 (from -r requirements.txt (line 9))
+  Downloading https://mirrors.aliyun.com/pypi/packages/8e/5e/c86a5643653825d3c913719e788e41386bee415c2b87b4f955432f2de6b2/pypdf2-3.0.1-py3-none-any.whl (232 kB)
+Requirement already satisfied: pydantic>=2.0.0 in d:\development\anaconda\lib\site-packages (from -r requirements.txt (line 10)) (2.10.3)
+Requirement already satisfied: starlette>=0.46.0 in d:\development\anaconda\lib\site-packages (from fastapi>=0.104.0->-r requirements.txt (line 1)) (1.0.0)
+Requirement already satisfied: typing-extensions>=4.8.0 in d:\development\anaconda\lib\site-packages (from fastapi>=0.104.0->-r requirements.txt (line 1)) (4.15.0)
+Requirement already satisfied: typing-inspection>=0.4.2 in d:\development\anaconda\lib\site-packages (from fastapi>=0.104.0->-r requirements.txt (line 1)) (0.4.2)
+Requirement already satisfied: annotated-doc>=0.0.2 in d:\development\anaconda\lib\site-packages (from fastapi>=0.104.0->-r requirements.txt (line 1)) (0.0.4)
+Requirement already satisfied: click>=7.0 in d:\development\anaconda\lib\site-packages (from uvicorn>=0.24.0->-r requirements.txt (line 2)) (8.1.8)
+Requirement already satisfied: h11>=0.8 in d:\development\anaconda\lib\site-packages (from uvicorn>=0.24.0->-r requirements.txt (line 2)) (0.16.0)
+Collecting langchain-core<2.0.0,>=1.4.0 (from langchain>=0.1.0->-r requirements.txt (line 5))
+  Downloading https://mirrors.aliyun.com/pypi/packages/0f/1a/86c38c27b81913a1c6c12448cab55defb5a1097c7dc9a4cea83f55477a2d/langchain_core-1.4.0-py3-none-any.whl (548 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 548.1/548.1 kB 238.4 kB/s eta 0:00:00
+Collecting langgraph<1.3.0,>=1.2.0 (from langchain>=0.1.0->-r requirements.txt (line 5))
+  Downloading https://mirrors.aliyun.com/pypi/packages/f6/e8/e3304ac0015c2bdb04ad9785e4ed65c788855ce7857ce6104dd2f5d322db/langgraph-1.2.0-py3-none-any.whl (234 kB)
+Requirement already satisfied: annotated-types>=0.6.0 in d:\development\anaconda\lib\site-packages (from pydantic>=2.0.0->-r requirements.txt (line 10)) (0.6.0)
+Requirement already satisfied: pydantic-core==2.27.1 in d:\development\anaconda\lib\site-packages (from pydantic>=2.0.0->-r requirements.txt (line 10)) (2.27.1)
+Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in d:\development\anaconda\lib\site-packages (from langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (1.33)
+Collecting langchain-protocol>=0.0.14 (from langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Using cached https://mirrors.aliyun.com/pypi/packages/1d/7a/9c97a7b9cbe4c5dc6a44cdb1545450c28f0c8ce89b9c1f0ee7fbad896263/langchain_protocol-0.0.15-py3-none-any.whl (7.0 kB)
+Collecting langsmith<1.0.0,>=0.3.45 (from langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Using cached https://mirrors.aliyun.com/pypi/packages/98/a9/51e644c1f1dbc3dd7d22dfd6412eab206d538c81e024e4f287373544bdcb/langsmith-0.8.3-py3-none-any.whl (399 kB)
+Requirement already satisfied: packaging>=23.2.0 in d:\development\anaconda\lib\site-packages (from langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (24.2)
+Requirement already satisfied: pyyaml<7.0.0,>=5.3.0 in d:\development\anaconda\lib\site-packages (from langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (6.0.2)
+Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in d:\development\anaconda\lib\site-packages (from langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (9.0.0)
+Collecting uuid-utils<1.0,>=0.12.0 (from langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Using cached https://mirrors.aliyun.com/pypi/packages/82/1a/10ce5709825de275b0a4f5c44f1cd0e13474b5a5430ea64567bdbd8dcd5f/uuid_utils-0.15.0-cp313-cp313-win_amd64.whl (174 kB)
+Requirement already satisfied: jsonpointer>=1.9 in d:\development\anaconda\lib\site-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (2.1)
+Collecting langgraph-checkpoint<5.0.0,>=4.1.0 (from langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Using cached https://mirrors.aliyun.com/pypi/packages/93/74/d3be2b41955e20ccd624dba5f6fe9d38dcee385ba470a6e13ed86732fc86/langgraph_checkpoint-4.1.0-py3-none-any.whl (56 kB)
+Collecting langgraph-prebuilt<1.2.0,>=1.1.0 (from langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Downloading https://mirrors.aliyun.com/pypi/packages/e9/43/3fe1a700b8490ed02679cdbbc8c915eb23a092faf496c9c1118abcd10be3/langgraph_prebuilt-1.1.0-py3-none-any.whl (41 kB)
+Collecting langgraph-sdk<0.4.0,>=0.3.0 (from langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Using cached https://mirrors.aliyun.com/pypi/packages/34/96/1c9f9fbfe756ddd850a2585e7f1949d8ebb97fdaa7a5eff8f45ed1314670/langgraph_sdk-0.3.14-py3-none-any.whl (97 kB)
+Collecting xxhash>=3.5.0 (from langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Using cached https://mirrors.aliyun.com/pypi/packages/99/57/d849a8d3afa1f8f4bc6a831cd89f49f9706fbbad94d2975d6140a171988c/xxhash-3.7.0-cp313-cp313-win_amd64.whl (31 kB)
+Collecting ormsgpack>=1.12.0 (from langgraph-checkpoint<5.0.0,>=4.1.0->langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Using cached https://mirrors.aliyun.com/pypi/packages/7b/e8/0fb45f57a2ada1fed374f7494c8cd55e2f88ccd0ab0a669aa3468716bf5f/ormsgpack-1.12.2-cp313-cp313-win_amd64.whl (117 kB)
+Requirement already satisfied: httpx>=0.25.2 in d:\development\anaconda\lib\site-packages (from langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5)) (0.28.1)
+Collecting orjson>=3.11.5 (from langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Using cached https://mirrors.aliyun.com/pypi/packages/67/bd/2775ff28bfe883b9aa1ff348300542eb2ef1ee18d8ae0e3a49846817a865/orjson-3.11.9-cp313-cp313-win_amd64.whl (127 kB)
+Requirement already satisfied: requests-toolbelt>=1.0.0 in d:\development\anaconda\lib\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (1.0.0)
+Requirement already satisfied: requests>=2.0.0 in d:\development\anaconda\lib\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (2.32.3)
+Requirement already satisfied: zstandard>=0.23.0 in d:\development\anaconda\lib\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (0.23.0)
+Requirement already satisfied: anyio in d:\development\anaconda\lib\site-packages (from httpx>=0.25.2->langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5)) (4.7.0)
+Requirement already satisfied: certifi in d:\development\anaconda\lib\site-packages (from httpx>=0.25.2->langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5)) (2025.4.26)
+Requirement already satisfied: httpcore==1.* in d:\development\anaconda\lib\site-packages (from httpx>=0.25.2->langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5)) (1.0.9)
+Requirement already satisfied: idna in d:\development\anaconda\lib\site-packages (from httpx>=0.25.2->langgraph-sdk<0.4.0,>=0.3.0->langgraph<1.3.0,>=1.2.0->langchain>=0.1.0->-r requirements.txt (line 5)) (3.7)
+Requirement already satisfied: openai<3.0.0,>=2.26.0 in d:\development\anaconda\lib\site-packages (from langchain-openai>=0.0.5->-r requirements.txt (line 6)) (2.32.0)
+Requirement already satisfied: tiktoken<1.0.0,>=0.7.0 in d:\development\anaconda\lib\site-packages (from langchain-openai>=0.0.5->-r requirements.txt (line 6)) (0.12.0)
+Requirement already satisfied: distro<2,>=1.7.0 in d:\development\anaconda\lib\site-packages (from openai<3.0.0,>=2.26.0->langchain-openai>=0.0.5->-r requirements.txt (line 6)) (1.9.0)
+Requirement already satisfied: jiter<1,>=0.10.0 in d:\development\anaconda\lib\site-packages (from openai<3.0.0,>=2.26.0->langchain-openai>=0.0.5->-r requirements.txt (line 6)) (0.14.0)
+Requirement already satisfied: sniffio in d:\development\anaconda\lib\site-packages (from openai<3.0.0,>=2.26.0->langchain-openai>=0.0.5->-r requirements.txt (line 6)) (1.3.0)
+Requirement already satisfied: tqdm>4 in d:\development\anaconda\lib\site-packages (from openai<3.0.0,>=2.26.0->langchain-openai>=0.0.5->-r requirements.txt (line 6)) (4.67.1)
+Requirement already satisfied: regex>=2022.1.18 in d:\development\anaconda\lib\site-packages (from tiktoken<1.0.0,>=0.7.0->langchain-openai>=0.0.5->-r requirements.txt (line 6)) (2024.11.6)
+Collecting langchain-classic<2.0.0,>=1.0.0 (from langchain-community>=0.0.20->-r requirements.txt (line 7))
+  Using cached https://mirrors.aliyun.com/pypi/packages/f5/78/2d9980d028ff0523eea503a77c200e2ff252a3a75eb6e7842bcf5f9c979b/langchain_classic-1.0.7-py3-none-any.whl (1.0 MB)
+Requirement already satisfied: SQLAlchemy<3.0.0,>=1.4.0 in d:\development\anaconda\lib\site-packages (from langchain-community>=0.0.20->-r requirements.txt (line 7)) (2.0.39)
+Collecting requests>=2.0.0 (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5))
+  Downloading https://mirrors.aliyun.com/pypi/packages/ef/e6/e300fce5fe83c30520607a015dabd985df3251e188d234bfe9492e17a389/requests-2.34.0-py3-none-any.whl (73 kB)
+Requirement already satisfied: aiohttp<4.0.0,>=3.8.3 in d:\development\anaconda\lib\site-packages (from langchain-community>=0.0.20->-r requirements.txt (line 7)) (3.11.10)
+Collecting dataclasses-json<0.7.0,>=0.6.7 (from langchain-community>=0.0.20->-r requirements.txt (line 7))
+  Downloading https://mirrors.aliyun.com/pypi/packages/c3/be/d0d44e092656fe7a06b55e6103cbce807cdbdee17884a5367c68c9860853/dataclasses_json-0.6.7-py3-none-any.whl (28 kB)
+Collecting pydantic-settings<3.0.0,>=2.10.1 (from langchain-community>=0.0.20->-r requirements.txt (line 7))
+  Downloading https://mirrors.aliyun.com/pypi/packages/ae/8d/f1af3832f5e6eb13ba94ee809e72b8ecb5eef226d27ee0bef7d963d943c7/pydantic_settings-2.14.1-py3-none-any.whl (60 kB)
+Collecting httpx-sse<1.0.0,>=0.4.0 (from langchain-community>=0.0.20->-r requirements.txt (line 7))
+  Using cached https://mirrors.aliyun.com/pypi/packages/d2/fd/6668e5aec43ab844de6fc74927e155a3b37bf40d7c3790e49fc0406b6578/httpx_sse-0.4.3-py3-none-any.whl (9.0 kB)
+Requirement already satisfied: numpy>=2.1.0 in d:\development\anaconda\lib\site-packages (from langchain-community>=0.0.20->-r requirements.txt (line 7)) (2.1.3)
+Requirement already satisfied: aiohappyeyeballs>=2.3.0 in d:\development\anaconda\lib\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community>=0.0.20->-r requirements.txt (line 7)) (2.4.4)
+Requirement already satisfied: aiosignal>=1.1.2 in d:\development\anaconda\lib\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community>=0.0.20->-r requirements.txt (line 7)) (1.2.0)
+Requirement already satisfied: attrs>=17.3.0 in d:\development\anaconda\lib\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community>=0.0.20->-r requirements.txt (line 7)) (24.3.0)
+Requirement already satisfied: frozenlist>=1.1.1 in d:\development\anaconda\lib\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community>=0.0.20->-r requirements.txt (line 7)) (1.5.0)
+Requirement already satisfied: multidict<7.0,>=4.5 in d:\development\anaconda\lib\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community>=0.0.20->-r requirements.txt (line 7)) (6.1.0)
+Requirement already satisfied: propcache>=0.2.0 in d:\development\anaconda\lib\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community>=0.0.20->-r requirements.txt (line 7)) (0.3.1)
+Requirement already satisfied: yarl<2.0,>=1.17.0 in d:\development\anaconda\lib\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community>=0.0.20->-r requirements.txt (line 7)) (1.18.0)
+Collecting marshmallow<4.0.0,>=3.18.0 (from dataclasses-json<0.7.0,>=0.6.7->langchain-community>=0.0.20->-r requirements.txt (line 7))
+  Downloading https://mirrors.aliyun.com/pypi/packages/be/2f/5108cb3ee4ba6501748c4908b908e55f42a5b66245b4cfe0c99326e1ef6e/marshmallow-3.26.2-py3-none-any.whl (50 kB)
+Collecting typing-inspect<1,>=0.4.0 (from dataclasses-json<0.7.0,>=0.6.7->langchain-community>=0.0.20->-r requirements.txt (line 7))
+  Using cached https://mirrors.aliyun.com/pypi/packages/65/f3/107a22063bf27bdccf2024833d3445f4eea42b2e598abfbd46f6a63b6cb0/typing_inspect-0.9.0-py3-none-any.whl (8.8 kB)
+Requirement already satisfied: charset_normalizer<4,>=2 in d:\development\anaconda\lib\site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (3.3.2)
+Requirement already satisfied: urllib3<3,>=1.26 in d:\development\anaconda\lib\site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.4.0->langchain>=0.1.0->-r requirements.txt (line 5)) (2.3.0)
+Requirement already satisfied: greenlet!=0.4.17 in d:\development\anaconda\lib\site-packages (from SQLAlchemy<3.0.0,>=1.4.0->langchain-community>=0.0.20->-r requirements.txt (line 7)) (3.1.1)
+Requirement already satisfied: mypy-extensions>=0.3.0 in d:\development\anaconda\lib\site-packages (from typing-inspect<1,>=0.4.0->dataclasses-json<0.7.0,>=0.6.7->langchain-community>=0.0.20->-r requirements.txt (line 7)) (1.0.0)
+Requirement already satisfied: colorama in d:\development\anaconda\lib\site-packages (from click>=7.0->uvicorn>=0.24.0->-r requirements.txt (line 2)) (0.4.6)
+Installing collected packages: xxhash, uuid-utils, typing-inspect, requests, pypdf2, ormsgpack, orjson, marshmallow, langchain-p
+rotocol, httpx-sse, dataclasses-json, pydantic-settings, langsmith, langgraph-sdk, langchain-core, langgraph-checkpoint, langchain-text-splitters, langchain-openai, langgraph-prebuilt, langchain-classic, langgraph, langchain-community, langchain
+  Attempting uninstall: requests
+    Found existing installation: requests 2.32.3
+    Uninstalling requests-2.32.3:
+      Successfully uninstalled requests-2.32.3
+  Attempting uninstall: pydantic-settings
+    Found existing installation: pydantic-settings 2.6.1
+    Uninstalling pydantic-settings-2.6.1:
+      Successfully uninstalled pydantic-settings-2.6.1
+Successfully installed dataclasses-json-0.6.7 httpx-sse-0.4.3 langchain-1.3.0 langchain-classic-1.0.7 langchain-community-0.4.1 
+langchain-core-1.4.0 langchain-openai-1.2.1 langchain-protocol-0.0.15 langchain-text-splitters-1.1.2 langgraph-1.2.0 langgraph-c
+heckpoint-4.1.0 langgraph-prebuilt-1.1.0 langgraph-sdk-0.3.14 langsmith-0.8.3 marshmallow-3.26.2 orjson-3.11.9 ormsgpack-1.12.2 pydantic-settings-2.14.1 pypdf2-3.0.1 requests-2.34.0 typing-inspect-0.9.0 uuid-utils-0.15.0 xxhash-3.7.0
+(base) PS E:\development\Interview-Colosseum\backend> 
